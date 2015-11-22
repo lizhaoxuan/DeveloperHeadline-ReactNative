@@ -10,6 +10,7 @@ var TimerMixin = require('react-timer-mixin');
 
 
 var Main = require('./main');
+var ViewPager = require('./viewpager');
 
 
 var {
