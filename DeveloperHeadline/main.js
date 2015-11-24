@@ -8,6 +8,9 @@
 var React = require('react-native');
 
 var DrawerLayout = require('./drawerLayout');
+var SwipeRefreshLayoutAndroid = require('./SwipeRefreshLayout');
+
+
 var {
   AppRegistry,
   StyleSheet,
@@ -18,9 +21,12 @@ var {
   DrawerLayoutAndroid,
   ToolbarAndroid,
   ViewPagerAndroid,
+  ListView, 
+  ToastAndroid, 
+  TouchableWithoutFeedback,
 } = React;
 
-
+var request_url = "https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json";
 var DRAWER_REF = 'drawer';
 
 var toolbarActions = [
@@ -34,6 +40,27 @@ var toolbarActions = [
 
 
 var MainView = React.createClass( {
+
+  getInitialState: function() {
+    return {
+      dataSource: new ListView.DataSource({
+        rowHasChanged: (row1, row2) => row1 !== row2
+      }),
+      loaded: false
+    }
+  },
+  componentDidMount: function() {
+    // fetch Data
+    fetch(request_url)
+      .then((response) => response.json())
+      .then((responseData) => {
+        this.setState({
+          dataSource: this.state.dataSource.cloneWithRows(responseData.movies),
+          loaded: true
+        });
+      })
+      .done();
+  },
 
   drawerLayout:function(){
     return (
@@ -66,13 +93,9 @@ var MainView = React.createClass( {
             actions={toolbarActions}
             //onIconClicked={() => this.refs[DRAWER_REF].openDrawer()}
             onActionSelected={this.onActionSelected} />
-      <ViewPagerAndroid
-        style={styles.container}
-        initialPage={2}>
+ 
 
-        
 
-        <View style={styles.pageStyle}>
 
             <ViewPagerAndroid
               style={[styles.container,{flex:1,backgroundColor:'red'}]}
@@ -86,28 +109,37 @@ var MainView = React.createClass( {
               <View style={styles.pageStyle}>
                 <Text>子View 333</Text>
               </View>
-            </ViewPagerAndroid>
-            
-          <Text style={{flex:1}}>First page</Text>
-        </View>
+            </ViewPagerAndroid>             
+            <ListView
+              style={{flex:4}}
+              dataSource={this.state.dataSource}
+              renderRow={this.renderItem}/>
+       
 
-        <View style={styles.pageStyle}>
-          <Text>Second page</Text>
-        </View>
 
-        <View style={styles.pageStyle}>
-          <Text>Three page</Text>
-        </View>
-      </ViewPagerAndroid>
     </DrawerLayoutAndroid>
+    );
+  },
+  renderItem: function(movie) {
+    // var mockData = {title: 'Title', year: '2015', posters: {thumbnail: 'http://i.imgur.com/UePbdph.jpg'}};
+    return (
+      <View style={styles.container}>
+        <Image source={{uri: movie.posters.thumbnail}} style={styles.thumbnail}/>
+        <View style={styles.rightContainer}>
+          <Text>{movie.title}</Text>
+          <Text>{movie.year}</Text>
+        </View>
+      </View>
     );
   },
 
 
 
-
   
 });
+
+
+
 
 var styles = StyleSheet.create({
   container: {
@@ -127,6 +159,27 @@ var styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
+  title: {
+    flex: 3,
+    fontSize: 18,
+    textAlign: 'left',
+    color: '#aaaaaa',
+  },
+  time: {
+    flex: 1,
+    textAlign: 'right',
+    color: '#aaaaaa',
+  },
+  rightContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  thumbnail: {
+    width: 53,
+    height: 81
+  }
+
 });
 
 
