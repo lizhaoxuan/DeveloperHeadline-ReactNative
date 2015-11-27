@@ -9,8 +9,10 @@ var React = require('react-native');
 var TimerMixin = require('react-timer-mixin');
 
 
+
 var Main = require('./main');
 var ViewPager = require('./viewpager');
+var Suggest = require('./suggest');
 
 
 var {
@@ -80,6 +82,12 @@ renderScene:function(route, navigator) {
       return (
         <View style={styles.container}>
           <Main  navigator={navigator} />
+        </View>
+      );
+    }else if (routeId == 'suggest'){
+      return (
+        <View style={styles.container}>
+          <Suggest  navigator={navigator} />
         </View>
       );
     }

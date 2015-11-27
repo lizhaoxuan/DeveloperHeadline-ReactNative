@@ -11,8 +11,11 @@ var {
   StyleSheet,
   View,
   Navigator,
+  PropTypes,
   Text,
   Image,
+  ToastAndroid,
+  TouchableWithoutFeedback,
 } = React;
 
 
@@ -20,6 +23,18 @@ var DRAWER_REF = 'drawer';
 
 
 var DrawerLayout = React.createClass({
+  propTypes: {
+    onItemClick: PropTypes.func,
+  },
+
+  _onItemClick:function(name){
+
+    this.props.navigator.push({
+        id: name,
+        name: '开发者头条',
+    });
+
+  },
 
   render:function(){
 
@@ -43,13 +58,14 @@ var DrawerLayout = React.createClass({
           </View>
 
           <Text style={[styles.line,{marginTop:7}]}/>
-
-          <View style={[styles.drawerItem]}>
-            <Image source={require('image!two')}
-                  style={styles.drawerItem_image} />
-            <Text style={styles.drawerItem_text}>我的分享</Text>
-            <Text style={styles.drawerItem_number}>0</Text>
-          </View>
+          <TouchableWithoutFeedback onPress={ () => this._onItemClick('suggest') }>
+            <View style={[styles.drawerItem]}>
+              <Image source={require('image!two')}
+                    style={styles.drawerItem_image} />
+              <Text style={styles.drawerItem_text}>我的分享</Text>
+              <Text style={styles.drawerItem_number}>0</Text>
+            </View>
+          </TouchableWithoutFeedback>
 
           <View style={[styles.drawerItem]}>
             <Image source={require('image!two')}

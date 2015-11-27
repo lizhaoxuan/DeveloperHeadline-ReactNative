@@ -28,7 +28,7 @@ var {
 
 var request_url = "https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json";
 var DRAWER_REF = 'drawer';
-
+var _navigator;
 var toolbarActions = [
   {title: '提醒', icon: require('image!ic_message_white'), show: 'always'},
   {title: '夜间模式', show: 'never'},
@@ -64,10 +64,21 @@ var MainView = React.createClass( {
 
   drawerLayout:function(){
     return (
-      <DrawerLayout/>
+      <DrawerLayout
+        navigator={this.props.navigator}/>
     );
   },
 
+  onDrawerItenClick:function(name){
+      this.props.navigator.push({
+        id: name,
+        name: '开发者头条',
+    });
+  },
+  onActionSelected: function(position) {
+      ToastAndroid.show(position.toString(), ToastAndroid.SHORT);
+
+  },
   render:function() {
   
     return (
@@ -75,8 +86,9 @@ var MainView = React.createClass( {
           renderScene={this.renderScene.bind(this)}/>
     );
   },
+
   renderScene:function(route, navigator) {
-  	
+  	_navigator = navigator;
     return (
         
     <DrawerLayoutAndroid
