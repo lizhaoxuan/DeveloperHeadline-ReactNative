@@ -19,7 +19,6 @@ var {
 } = React;
 
 
-var DRAWER_REF = 'drawer';
 
 
 var DrawerLayout = React.createClass({

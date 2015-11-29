@@ -13,6 +13,7 @@ var TimerMixin = require('react-timer-mixin');
 var Main = require('./main');
 var ViewPager = require('./viewpager');
 var Suggest = require('./suggest');
+var Content = require('./content');
 
 
 var {
@@ -90,7 +91,13 @@ renderScene:function(route, navigator) {
           <Suggest  navigator={navigator} />
         </View>
       );
-    }
+    }else if (routeId == 'content'){
+      return (
+        <View style={styles.container}>
+          <Content  navigator={navigator} />
+        </View>
+      )
+    } 
 
   },
 

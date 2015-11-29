@@ -6,9 +6,9 @@
 'use strict';
 
 var React = require('react-native');
-
 var DrawerLayout = require('./drawerLayout');
 var SwipeRefreshLayoutAndroid = require('./SwipeRefreshLayout');
+
 
 
 var {
@@ -23,16 +23,16 @@ var {
   ViewPagerAndroid,
   ListView, 
   ToastAndroid, 
-  TouchableWithoutFeedback,
+  TouchableOpacity,
 } = React;
 
 var request_url = "https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json";
 var DRAWER_REF = 'drawer';
-var _navigator;
+
+
 var toolbarActions = [
-  {title: '提醒', icon: require('image!ic_message_white'), show: 'always'},
-  {title: '夜间模式', show: 'never'},
-  {title: '设置选项', show: 'never'},
+  {title: '添加', icon: require('image!ic_message_white'), show: 'always'},
+  {title: '查找', icon: require('image!ic_favorites_white'), show: 'always'},
 ];
 
 
@@ -40,6 +40,7 @@ var toolbarActions = [
 
 
 var MainView = React.createClass( {
+  
 
   getInitialState: function() {
     return {
@@ -62,6 +63,13 @@ var MainView = React.createClass( {
       .done();
   },
 
+  onItemClick:function(position){
+      ToastAndroid.show("点击了："+position, ToastAndroid.SHORT);
+      this.props.navigator.push({
+        id: 'content',
+        name: '开发者头条',
+      });
+  }
   drawerLayout:function(){
     return (
       <DrawerLayout
@@ -69,18 +77,16 @@ var MainView = React.createClass( {
     );
   },
 
-  onDrawerItenClick:function(name){
-      this.props.navigator.push({
-        id: name,
-        name: '开发者头条',
-    });
+  onDrawerItemClick:function(){
+      this.drawer.openDrawer();
   },
+
   onActionSelected: function(position) {
       ToastAndroid.show(position.toString(), ToastAndroid.SHORT);
 
   },
+
   render:function() {
-  
     return (
       <Navigator
           renderScene={this.renderScene.bind(this)}/>
@@ -88,11 +94,10 @@ var MainView = React.createClass( {
   },
 
   renderScene:function(route, navigator) {
-  	_navigator = navigator;
     return (
         
     <DrawerLayoutAndroid
-      ref={DRAWER_REF}
+      ref={(drawer) => { this.drawer = drawer; }}
       drawerWidth={270}
       drawerPosition={DrawerLayoutAndroid.positions.Left}
       keyboardDismissMode="on-drag"
@@ -103,27 +108,31 @@ var MainView = React.createClass( {
             titleColor="white"
             style={styles.toolbar}
             actions={toolbarActions}
-            //onIconClicked={() => this.refs[DRAWER_REF].openDrawer()}
+            onIconClicked={this.onDrawerItemClick}
             onActionSelected={this.onActionSelected} />
- 
-
-
 
             <ViewPagerAndroid
-              style={[styles.container,{flex:1,backgroundColor:'red'}]}
+              style={[styles.container,{flex:2}]}
               initialPage={1}>
+
               <View style={styles.pageStyle}>
-                <Text>子View 111</Text>
+                <Image style={styles.pagerImage} source={require('image!splash_logo')} >
+                  <Text style={styles.pagerText}>一周IT技术干货(码农周刊第95期)</Text>
+                </Image>
               </View>
               <View style={styles.pageStyle}>
-                <Text>子View 222</Text>
+                <Image style={styles.pagerImage} source={require('image!splash_logo')} >
+                  <Text style={styles.pagerText}>二周IT技术干货(码农周刊第95期)</Text>
+                </Image>
               </View>
               <View style={styles.pageStyle}>
-                <Text>子View 333</Text>
+                <Image style={styles.pagerImage} source={require('image!splash_logo')} >
+                  <Text style={styles.pagerText}>三周IT技术干货(码农周刊第95期)</Text>
+                </Image>
               </View>
             </ViewPagerAndroid>             
             <ListView
-              style={{flex:4}}
+              style={{flex:4 ,backgroundColor:'white'}}
               dataSource={this.state.dataSource}
               renderRow={this.renderItem}/>
        
@@ -134,14 +143,30 @@ var MainView = React.createClass( {
   },
   renderItem: function(movie) {
     // var mockData = {title: 'Title', year: '2015', posters: {thumbnail: 'http://i.imgur.com/UePbdph.jpg'}};
+            // <Image source={{uri: movie.posters.thumbnail}} style={styles.thumbnail}/>
+        // <View style={styles.rightContainer}>
+        //   <Text>{movie.title}</Text>
+        //   <Text>{movie.year}</Text>
+        // </View>
     return (
-      <View style={styles.container}>
-        <Image source={{uri: movie.posters.thumbnail}} style={styles.thumbnail}/>
-        <View style={styles.rightContainer}>
-          <Text>{movie.title}</Text>
-          <Text>{movie.year}</Text>
+      <TouchableOpacity onPress={ () => this.onItemClick('suggest') }>
+      <View style={styles.itemLayout}>
+        <View style={ {flexDirection:'row',alignItems:'flex-start',justifyContent:'space-between'}}>
+          <Text style={styles.itemTitle}>{movie.title}</Text>
+          <Image style={styles.itemImge} source={require('image!two')} />
+        </View>
+        <View style={{flexDirection:'row',alignItems:'flex-start',justifyContent:'space-between',marginTop:5,}}>
+          <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+            <Image style={styles.itemIcon} source={require('image!one')} />
+            <Text style={styles.itemText}>10</Text>
+            <Image style={[styles.itemIcon,{marginLeft: 10}]} source={require('image!three')} />
+            <Text style={styles.itemText}>28</Text>
+          </View>
+          
+          <Text style={styles.itemText}>选自编程派</Text>
         </View>
       </View>
+       </TouchableOpacity>
     );
   },
 
@@ -170,27 +195,41 @@ var styles = StyleSheet.create({
   pageStyle: {
     alignItems: 'center',
     padding: 20,
+    backgroundColor: 'red',
   },
-  title: {
-    flex: 3,
+  itemLayout: {
+    padding: 10,
+    flexWrap: 'nowrap',
+  },
+  itemTitle: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  itemImge: {
+    width: 50,
+    height: 50,
+  },
+  itemIcon:{
+    width: 20,
+    height: 20,
+    marginLeft: 5,
+    marginRight: 5,
+  },
+  itemText:{
+    color: 'gray',
+  },
+  pagerImage:{
+    flex:1,
+    justifyContent :'flex-end',
+  },
+  pagerText:{
     fontSize: 18,
-    textAlign: 'left',
-    color: '#aaaaaa',
+    fontWeight: 'bold',
+    color: 'white',
+    marginLeft: 10,
+    
   },
-  time: {
-    flex: 1,
-    textAlign: 'right',
-    color: '#aaaaaa',
-  },
-  rightContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  thumbnail: {
-    width: 53,
-    height: 81
-  }
 
 });
 
